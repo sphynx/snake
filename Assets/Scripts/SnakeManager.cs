@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class SnakeManager : MonoBehaviour
@@ -5,46 +6,38 @@ public class SnakeManager : MonoBehaviour
     [SerializeField]
     private int width = 32, height = 18; // so that it's 16 * 9 ratio :)
 
-    private Grid grid;
+    private Snake snake;
 
     [SerializeField]
     private TilesCollection tilePrefabs;
+
+    [SerializeField]
+    private float tileScale = 0.8f;
+
+    [SerializeField]
+    private float margin = 1f;
+
+    [SerializeField]
+    private float gameSpeed = 0.3f;
+
+    private GameObject[,] objectsGrid;
 
     void Start()
     {
         float orthSize = Camera.main.orthographicSize;
         float aspectRatio = Camera.main.aspect;
 
-        float margin = 1f;
-        float scale = 0.8f;
-
-        // Set the camera's origin to bottom-left corner, so that bottom-left of the screen
-        // is (0, 0) in the world.            
+        // Set the camera's origin to bottom-left corner, so that
+        // bottom-left of the screen is (0, 0) in the world.
         Camera.main.transform.position = new Vector3(aspectRatio * orthSize, orthSize, -10f);
 
-        grid = new Grid(width, height);
+        snake = new Snake(width, height, 2, 12, 7, Direction.Right, true);
+        snake.SpawnApple(15, 15);
 
-        // Build walls around the map:
-        for (int row = 0; row < height; row++)
-        {
-            grid.SetTile(row, 0, Tile.Wall);
-            grid.SetTile(row, width - 1, Tile.Wall);
-        }
-        for (int j = 0; j < width; j++)
-        {
-            grid.SetTile(0, j, Tile.Wall);
-            grid.SetTile(height - 1, j, Tile.Wall);
-        }
+        var grid = snake.Grid;
+        var scale = Vector3.one * tileScale;
 
-        // Starting snake
-        grid.SetTile(2, 10, Tile.SnakeBody);
-        grid.SetTile(2, 11, Tile.SnakeBody);
-        grid.SetTile(2, 12, Tile.SnakeHead);
-
-        // Starting apple
-        grid.SetTile(4, 16, Tile.Apple);
-
-        var scaleVec = Vector3.one * scale;
+        objectsGrid = new GameObject[height, width];
 
         for (int row = 0; row < grid.Height; row++)
         {
@@ -52,14 +45,75 @@ public class SnakeManager : MonoBehaviour
             {
                 var pos = new Vector3(col + 0.5f + margin, row + 0.5f + margin, 0f);
                 GameObject prefab = tilePrefabs[grid.GetTile(row, col)];
-                prefab.transform.localScale = scaleVec;
-                Instantiate(prefab, pos, Quaternion.identity);
+                prefab.transform.localScale = scale;
+                var obj = Instantiate(prefab, pos, Quaternion.identity);
+                objectsGrid[row, col] = obj;
             }
+        }
+
+        StartCoroutine(nameof(MoveSnake));
+    }
+
+    IEnumerator MoveSnake()
+    {
+        while (true)
+        {
+            MoveResult moveResult = snake.Move();
+            UpdateSnake(moveResult);
+
+            yield return new WaitForSeconds(gameSpeed);
         }
     }
 
-    void Update()
+    void CreateTile(Cell cell)
     {
-        
+        var row = cell.Row;
+        var col = cell.Col;
+        var scale = Vector3.one * tileScale;
+
+        GameObject prefab = tilePrefabs[snake.Grid.GetTile(row, col)];
+        prefab.transform.localScale = scale;
+        var pos = new Vector3(col + 0.5f + margin, row + 0.5f + margin, 0f);
+        var newObj = Instantiate(prefab, pos, Quaternion.identity);
+        objectsGrid[row, col] = newObj;
+    }
+
+    void DestroyTile(Cell cell)
+    {
+        var obj = objectsGrid[cell.Row, cell.Col];
+        Destroy(obj);
+        objectsGrid[cell.Row, cell.Col] = null;
+    }
+
+    void UpdateTile(Cell cell)
+    {
+        DestroyTile(cell);
+        CreateTile(cell);
+    }
+
+    void UpdateSnake(MoveResult update)
+    {
+        foreach (Cell c in update.UpdateCells)
+            UpdateTile(c);
+    }
+
+    private void Update()
+    {
+        var vert = Input.GetAxis("Vertical");
+        var horiz = Input.GetAxis("Horizontal");
+        var cancel = Input.GetAxis("Cancel");
+
+        Debug.Log($"{vert}, {horiz}, {cancel}");
+
+        if (cancel > 0)
+            Application.Quit();
+        else if (vert < 0 && horiz == 0)
+            snake.Dir = Direction.Down;
+        else if (vert > 0 && horiz == 0)
+            snake.Dir = Direction.Up;
+        else if (horiz < 0 && vert == 0)
+            snake.Dir = Direction.Left;
+        else if (horiz > 0 && vert == 0)
+            snake.Dir = Direction.Right;
     }
 }
