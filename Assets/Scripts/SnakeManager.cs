@@ -1,10 +1,11 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SnakeManager : MonoBehaviour
 {
     [SerializeField]
-    private int width = 32, height = 18; // so that it's 16 * 9 ratio :)
+    private int width = 33, height = 18; // so that it's 16 * 9 ratio :)
 
     private Snake snake;
 
@@ -20,6 +21,12 @@ public class SnakeManager : MonoBehaviour
     [SerializeField]
     private float gameSpeed = 0.3f;
 
+    [SerializeField]
+    private LevelUI levelUI;
+
+    [SerializeField]
+    private Score score, hiScore;
+
     private GameObject[,] objectsGrid;
 
     void Start()
@@ -31,25 +38,21 @@ public class SnakeManager : MonoBehaviour
         // bottom-left of the screen is (0, 0) in the world.
         Camera.main.transform.position = new Vector3(aspectRatio * orthSize, orthSize, -10f);
 
-        snake = new Snake(width, height, 2, 12, 7, Direction.Right, true);
+        snake = new Snake(width, height, 2, 12, 3, Direction.Right, true);
         snake.SpawnApple(15, 15);
-
-        var grid = snake.Grid;
-        var scale = Vector3.one * tileScale;
 
         objectsGrid = new GameObject[height, width];
 
-        for (int row = 0; row < grid.Height; row++)
+        for (int row = 0; row < snake.Grid.Height; row++)
         {
-            for (int col = 0; col < grid.Width; col++)
+            for (int col = 0; col < snake.Grid.Width; col++)
             {
-                var pos = new Vector3(col + 0.5f + margin, row + 0.5f + margin, 0f);
-                GameObject prefab = tilePrefabs[grid.GetTile(row, col)];
-                prefab.transform.localScale = scale;
-                var obj = Instantiate(prefab, pos, Quaternion.identity);
-                objectsGrid[row, col] = obj;
+                CreateTile(new Cell(row, col));
             }
         }
+
+        score.Value = 0;
+        levelUI.SetScore(score.Value);
 
         StartCoroutine(nameof(MoveSnake));
     }
@@ -73,7 +76,7 @@ public class SnakeManager : MonoBehaviour
 
         GameObject prefab = tilePrefabs[snake.Grid.GetTile(row, col)];
         prefab.transform.localScale = scale;
-        var pos = new Vector3(col + 0.5f + margin, row + 0.5f + margin, 0f);
+        var pos = new Vector3(col + 0.5f + margin, row + 1.5f + margin, 0f);
         var newObj = Instantiate(prefab, pos, Quaternion.identity);
         objectsGrid[row, col] = newObj;
     }
@@ -95,25 +98,48 @@ public class SnakeManager : MonoBehaviour
     {
         foreach (Cell c in update.UpdateCells)
             UpdateTile(c);
+
+        switch (update.Type)
+        {
+            case MoveResultType.Eat:
+                score.Value = score.Value + 1;
+                levelUI.SetScore(score.Value);
+                Cell appleCell = snake.SpawnAppleInEmptyTile();
+                UpdateTile(appleCell);
+                break;
+
+            case MoveResultType.Hit:
+                SceneManager.LoadScene("GameOver");
+                break;
+        };
     }
 
-    private void Update()
+    void Update()
     {
         var vert = Input.GetAxis("Vertical");
         var horiz = Input.GetAxis("Horizontal");
         var cancel = Input.GetAxis("Cancel");
 
-        Debug.Log($"{vert}, {horiz}, {cancel}");
-
         if (cancel > 0)
             Application.Quit();
         else if (vert < 0 && horiz == 0)
-            snake.Dir = Direction.Down;
+            SetSnakeDirection(Direction.Down);
         else if (vert > 0 && horiz == 0)
-            snake.Dir = Direction.Up;
+            SetSnakeDirection(Direction.Up);
         else if (horiz < 0 && vert == 0)
-            snake.Dir = Direction.Left;
+            SetSnakeDirection(Direction.Left);
         else if (horiz > 0 && vert == 0)
-            snake.Dir = Direction.Right;
+            SetSnakeDirection(Direction.Right);
+    }
+
+    void SetSnakeDirection(Direction dir)
+    {
+        // Disable moving in oppposite direction.
+        // (Note: we could also allow it and reverse the whole snake,
+        // making its tail a new head, but that is somewhat unconventional).
+        if (snake.Dir != Grid.InvertDirection(dir))
+        {
+            snake.Dir = dir;
+        }
     }
 }

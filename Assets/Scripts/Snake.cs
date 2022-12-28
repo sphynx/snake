@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -234,5 +233,24 @@ public class Snake
         var cell = new Cell(row, col);
         Grid.CheckBounds(cell);
         Grid.SetTile(cell, Tile.Apple);
+    }
+
+    public Cell SpawnAppleInEmptyTile()
+    {
+        const int MAX_ATTEMPTS = 200;
+        for (int i = 0; i < MAX_ATTEMPTS; i++)
+        {
+            var row = UnityEngine.Random.Range(0, Grid.Height);
+            var col = UnityEngine.Random.Range(0, Grid.Width);
+
+            if (Grid.GetTile(row, col) == Tile.Empty)
+            {
+                SpawnApple(row, col);
+                return new Cell(row, col);
+            }
+        }
+
+        throw new Exception($"Couldn't generate apple after {MAX_ATTEMPTS} attempts, " +
+            $"something is wrong with the code");
     }
 }

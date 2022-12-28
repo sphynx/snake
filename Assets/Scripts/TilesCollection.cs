@@ -19,7 +19,6 @@ public class TilesCollection : ScriptableObject
     // The mapping between tiles and their prefabs.
     public TilePrefab[] AllPrefabs;
 
-
     // Internal data.
     private Dictionary<Tile, GameObject> data;
 
