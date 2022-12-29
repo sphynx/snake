@@ -601,9 +601,9 @@ MonoBehaviour:
   width: 33
   height: 18
   tilePrefabs: {fileID: 11400000, guid: 3582c855fc27e4dfcb0b648cdc0b2745, type: 2}
-  tileScale: 0.8
+  tileScale: 0.9
   margin: 1
-  gameSpeed: 0.07
+  gameSpeed: 0.15
   levelUI: {fileID: 55616020}
   score: {fileID: 11400000, guid: 71a7614c2abaf46b08325f341e54e780, type: 2}
   hiScore: {fileID: 11400000, guid: 770b975dfc6ed4a168e744ff9e4c3ab1, type: 2}

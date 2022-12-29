@@ -74,10 +74,25 @@ public class SnakeManager : MonoBehaviour
         var col = cell.Col;
         var scale = Vector3.one * tileScale;
 
-        GameObject prefab = tilePrefabs[snake.Grid.GetTile(row, col)];
+        Tile tile = snake.Grid.GetTile(row, col);
+        GameObject prefab = tilePrefabs[tile];
         prefab.transform.localScale = scale;
         var pos = new Vector3(col + 0.5f + margin, row + 1.5f + margin, 0f);
-        var newObj = Instantiate(prefab, pos, Quaternion.identity);
+
+        Quaternion q = Quaternion.identity;
+        if (tile == Tile.SnakeHead)
+        {
+            q = snake.Dir switch
+            {
+                Direction.Up => Quaternion.Euler(0, 0, 90),
+                Direction.Down => Quaternion.Euler(0, 0, -90),
+                Direction.Left => Quaternion.Euler(0, 0, 180),
+                Direction.Right => Quaternion.identity,
+                _ => throw new System.Exception($"Wrong direction"),
+            };
+        }
+
+        var newObj = Instantiate(prefab, pos, q);
         objectsGrid[row, col] = newObj;
     }
 
