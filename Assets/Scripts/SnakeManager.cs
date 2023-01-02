@@ -27,6 +27,9 @@ public class SnakeManager : MonoBehaviour
     [SerializeField]
     private Score score, hiScore;
 
+    [SerializeField]
+    private AudioSource appleCrunch;
+
     private GameObject[,] objectsGrid;
 
     void Start()
@@ -117,6 +120,7 @@ public class SnakeManager : MonoBehaviour
         switch (update.Type)
         {
             case MoveResultType.Eat:
+                appleCrunch.Play();
                 score.Value = score.Value + 1;
                 levelUI.SetScore(score.Value);
                 Cell appleCell = snake.SpawnAppleInEmptyTile();

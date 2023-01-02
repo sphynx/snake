@@ -16,16 +16,20 @@ public class GameOverUI : MonoBehaviour
     [SerializeField]
     private TMP_Text hiScoreText;
 
+    [SerializeField]
+    private TMP_Text newHiScoreText;
+
     void Start()
     {
-        //bool record = false;
         if (score.Value > hiScore.Value)
         {
-            //record = true;
             hiScore.Value = score.Value;
+            newHiScoreText.enabled = true;
         }
-
-        //string newBest = record ? "- NEW BEST!" : "";
+        else
+        {
+            newHiScoreText.enabled = false;
+        }
 
         scoreText.text = $"Your score: {score.Value}";
         hiScoreText.text = $"High score: {hiScore.Value}";
