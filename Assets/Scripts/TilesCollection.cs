@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +7,7 @@ using UnityEngine;
 [CreateAssetMenu]
 public class TilesCollection : ScriptableObject
 {
-    [Serializable]
+    [System.Serializable]
     public class TilePrefab
     {
         public GameObject prefab;
@@ -20,7 +19,7 @@ public class TilesCollection : ScriptableObject
     public TilePrefab[] AllPrefabs;
 
     // Internal data.
-    private Dictionary<Tile, GameObject> data;
+    private Dictionary<Tile, List<GameObject>> data;
 
     // Overrides indexing operator.
     public GameObject this[Tile tile]
@@ -28,7 +27,10 @@ public class TilesCollection : ScriptableObject
         get
         {
             Init();
-            return data[tile];
+
+            var tiles = data[tile];
+            int randomIx = Random.Range(0, tiles.Count);
+            return tiles[randomIx];
         }
     }
 
@@ -37,10 +39,19 @@ public class TilesCollection : ScriptableObject
         if (data != null)
             return;
 
-        data = new Dictionary<Tile, GameObject>();
+        data = new Dictionary<Tile, List<GameObject>>();
         foreach (var tilePrefab in AllPrefabs)
         {
-            data[tilePrefab.tile] = tilePrefab.prefab;
+            if (data.ContainsKey(tilePrefab.tile))
+            {
+                data[tilePrefab.tile].Add(tilePrefab.prefab);
+            }
+            else
+            {
+                var prefabs = new List<GameObject>();
+                prefabs.Add(tilePrefab.prefab);
+                data[tilePrefab.tile] = prefabs;
+            }
         }
     }
 }

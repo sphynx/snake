@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 public class SnakeManager : MonoBehaviour
 {
     [SerializeField]
-    private int width = 33, height = 18; // so that it's 16 * 9 ratio :)
+    private int height;
+
+    private int width; // determined based on the screen aspect ration
 
     private Snake snake;
 
@@ -13,13 +15,13 @@ public class SnakeManager : MonoBehaviour
     private TilesCollection tilePrefabs;
 
     [SerializeField]
-    private float tileScale = 0.8f;
+    private float tileScale = 0.9f;
 
     [SerializeField]
-    private float margin = 1f;
+    private float margin = 0.5f;
 
     [SerializeField]
-    private float gameSpeed = 0.3f;
+    private float gameSpeed = 0.15f;
 
     [SerializeField]
     private LevelUI levelUI;
@@ -30,18 +32,22 @@ public class SnakeManager : MonoBehaviour
     [SerializeField]
     private AudioSource appleCrunch;
 
+    [SerializeField]
+    private AudioSource snakeHit;
+
     private GameObject[,] objectsGrid;
 
     void Start()
     {
         float orthSize = Camera.main.orthographicSize;
         float aspectRatio = Camera.main.aspect;
+        width = (int) (height * aspectRatio);
 
         // Set the camera's origin to bottom-left corner, so that
         // bottom-left of the screen is (0, 0) in the world.
         Camera.main.transform.position = new Vector3(aspectRatio * orthSize, orthSize, -10f);
 
-        snake = new Snake(width, height, 2, 12, 3, Direction.Right, true);
+        snake = new Snake(width, height, 2, 12, 4, Direction.Right, true);
         snake.SpawnApple(15, 15);
 
         objectsGrid = new GameObject[height, width];
@@ -91,7 +97,7 @@ public class SnakeManager : MonoBehaviour
                 Direction.Down => Quaternion.Euler(0, 0, -90),
                 Direction.Left => Quaternion.Euler(0, 0, 180),
                 Direction.Right => Quaternion.identity,
-                _ => throw new System.Exception($"Wrong direction"),
+                _ => throw new System.Exception($"Wrong direction: {snake.Dir}"),
             };
         }
 
@@ -125,12 +131,20 @@ public class SnakeManager : MonoBehaviour
                 levelUI.SetScore(score.Value);
                 Cell appleCell = snake.SpawnAppleInEmptyTile();
                 UpdateTile(appleCell);
+                gameSpeed *= 0.9f;
                 break;
 
             case MoveResultType.Hit:
-                SceneManager.LoadScene("GameOver");
+                snakeHit.Play();
+                StopCoroutine(nameof(MoveSnake));
+                Invoke(nameof(GameOver), 0.5f);
                 break;
         };
+    }
+
+    void GameOver()
+    {
+        SceneManager.LoadScene("GameOver");
     }
 
     void Update()

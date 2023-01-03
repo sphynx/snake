@@ -39,12 +39,11 @@ public class GameOverUI : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Restart();
-        };
-    }
-
-    void Restart()
-    {
-        SceneManager.LoadScene("Level");
+            SceneManager.LoadScene("Level");
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
     }
 }

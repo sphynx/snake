@@ -275,7 +275,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -192.24, y: 0.000013351}
+  m_AnchoredPosition: {x: -139.1, y: -0.0000058828}
   m_SizeDelta: {x: 682.2976, y: 478.3289}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &832564777
@@ -351,8 +351,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 348.74, y: -81.5759}
-  m_SizeDelta: {x: 369.52, y: 62.6877}
+  m_AnchoredPosition: {x: 322, y: -107}
+  m_SizeDelta: {x: 300.28, y: 56.271}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1201018434
 MonoBehaviour:
@@ -406,8 +406,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -442,7 +442,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: -4.8125305, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -577,7 +577,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1328030133}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 913.64667, y: 216.65001, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -619,8 +619,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.051601, y: -275}
-  m_SizeDelta: {x: 1066.9, y: 50}
+  m_AnchoredPosition: {x: 0.012453, y: -275}
+  m_SizeDelta: {x: 960.53, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1403738875
 MonoBehaviour:
@@ -642,7 +642,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Code: sphynx. Sound: Juhani Junkala, Koops. Graphics: TODO'
+  m_text: 'Code: sphynx. Sound: Erich Izdepski, Koops. Graphics: Cosme, Caye'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -754,8 +754,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 306, y: 152.46194}
-  m_SizeDelta: {x: 412.0518, y: 75.076}
+  m_AnchoredPosition: {x: 299, y: 164}
+  m_SizeDelta: {x: 346.2801, y: 78.2843}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1415640620
 MonoBehaviour:
