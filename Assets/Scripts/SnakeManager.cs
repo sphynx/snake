@@ -37,11 +37,15 @@ public class SnakeManager : MonoBehaviour
 
     private GameObject[,] objectsGrid;
 
+    private float time;
+
+    private bool gameOver;
+
     void Start()
     {
         float orthSize = Camera.main.orthographicSize;
         float aspectRatio = Camera.main.aspect;
-        width = (int) (height * aspectRatio);
+        width = (int) (height * aspectRatio) + 2;
 
         // Set the camera's origin to bottom-left corner, so that
         // bottom-left of the screen is (0, 0) in the world.
@@ -63,17 +67,18 @@ public class SnakeManager : MonoBehaviour
         score.Value = 0;
         levelUI.SetScore(score.Value);
 
-        StartCoroutine(nameof(MoveSnake));
+        time = 0f;
+        gameOver = false;
     }
 
-    IEnumerator MoveSnake()
+    void MoveSnake(Direction dir)
     {
-        while (true)
+        if (snake.Dir != Grid.InvertDirection(dir))
         {
+            snake.Dir = dir;
             MoveResult moveResult = snake.Move();
             UpdateSnake(moveResult);
-
-            yield return new WaitForSeconds(gameSpeed);
+            time = 0f;
         }
     }
 
@@ -86,7 +91,7 @@ public class SnakeManager : MonoBehaviour
         Tile tile = snake.Grid.GetTile(row, col);
         GameObject prefab = tilePrefabs[tile];
         prefab.transform.localScale = scale;
-        var pos = new Vector3(col + 0.5f + margin, row + 1.5f + margin, 0f);
+        var pos = new Vector3(col + 0.75f + margin, row + 1.5f + margin, 0f);
 
         Quaternion q = Quaternion.identity;
         if (tile == Tile.SnakeHead)
@@ -136,7 +141,7 @@ public class SnakeManager : MonoBehaviour
 
             case MoveResultType.Hit:
                 snakeHit.Play();
-                StopCoroutine(nameof(MoveSnake));
+                gameOver = true;
                 Invoke(nameof(GameOver), 0.5f);
                 break;
         };
@@ -149,30 +154,35 @@ public class SnakeManager : MonoBehaviour
 
     void Update()
     {
-        var vert = Input.GetAxis("Vertical");
-        var horiz = Input.GetAxis("Horizontal");
-        var cancel = Input.GetAxis("Cancel");
+        time += Time.deltaTime;
 
-        if (cancel > 0)
-            Application.Quit();
-        else if (vert < 0 && horiz == 0)
-            SetSnakeDirection(Direction.Down);
-        else if (vert > 0 && horiz == 0)
-            SetSnakeDirection(Direction.Up);
-        else if (horiz < 0 && vert == 0)
-            SetSnakeDirection(Direction.Left);
-        else if (horiz > 0 && vert == 0)
-            SetSnakeDirection(Direction.Right);
-    }
-
-    void SetSnakeDirection(Direction dir)
-    {
-        // Disable moving in oppposite direction.
-        // (Note: we could also allow it and reverse the whole snake,
-        // making its tail a new head, but that is somewhat unconventional).
-        if (snake.Dir != Grid.InvertDirection(dir))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            snake.Dir = dir;
+            Application.Quit();
+        }
+        else if (gameOver)
+        {
+            return;
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            MoveSnake(Direction.Down);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            MoveSnake(Direction.Up);
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            MoveSnake(Direction.Left);
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            MoveSnake(Direction.Right);
+        }
+        else if (time >= gameSpeed)
+        {
+            MoveSnake(snake.Dir);
         }
     }
 }
