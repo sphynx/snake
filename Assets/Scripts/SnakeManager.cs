@@ -35,6 +35,9 @@ public class SnakeManager : MonoBehaviour
     [SerializeField]
     private AudioSource snakeHit;
 
+    [SerializeField]
+    private AudioSource backgroundMusic;
+
     private GameObject[,] objectsGrid;
 
     private float time;
@@ -73,7 +76,7 @@ public class SnakeManager : MonoBehaviour
 
     void MoveSnake(Direction dir)
     {
-        if (snake.Dir != Grid.InvertDirection(dir))
+        if (snake.Dir != Grid.InvertDirection(dir) && snake.Dir != dir)
         {
             snake.Dir = dir;
             MoveResult moveResult = snake.Move();
@@ -137,6 +140,8 @@ public class SnakeManager : MonoBehaviour
                 Cell appleCell = snake.SpawnAppleInEmptyTile();
                 UpdateTile(appleCell);
                 gameSpeed *= 0.9f;
+                backgroundMusic.time = 0f;
+                backgroundMusic.pitch *= 1.01f;
                 break;
 
             case MoveResultType.Hit:
@@ -164,19 +169,19 @@ public class SnakeManager : MonoBehaviour
         {
             return;
         }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
             MoveSnake(Direction.Down);
         }
-        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
             MoveSnake(Direction.Up);
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
             MoveSnake(Direction.Left);
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
+        else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
             MoveSnake(Direction.Right);
         }

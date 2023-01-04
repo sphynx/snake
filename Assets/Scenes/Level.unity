@@ -982,6 +982,7 @@ MonoBehaviour:
   hiScore: {fileID: 11400000, guid: 770b975dfc6ed4a168e744ff9e4c3ab1, type: 2}
   appleCrunch: {fileID: 824934662}
   snakeHit: {fileID: 1598372640}
+  backgroundMusic: {fileID: 173722645}
 --- !u!4 &1932854796
 Transform:
   m_ObjectHideFlags: 0
