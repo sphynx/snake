@@ -74,9 +74,9 @@ public class SnakeManager : MonoBehaviour
         gameOver = false;
     }
 
-    void MoveSnake(Direction dir)
+    void MoveSnake(Direction dir, bool onTime)
     {
-        if (snake.Dir != Grid.InvertDirection(dir) && snake.Dir != dir)
+        if (snake.Dir != Grid.InvertDirection(dir) && (onTime || snake.Dir != dir))
         {
             snake.Dir = dir;
             MoveResult moveResult = snake.Move();
@@ -140,7 +140,6 @@ public class SnakeManager : MonoBehaviour
                 Cell appleCell = snake.SpawnAppleInEmptyTile();
                 UpdateTile(appleCell);
                 gameSpeed *= 0.9f;
-                backgroundMusic.time = 0f;
                 backgroundMusic.pitch *= 1.01f;
                 break;
 
@@ -171,23 +170,23 @@ public class SnakeManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
-            MoveSnake(Direction.Down);
+            MoveSnake(Direction.Down, false);
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
         {
-            MoveSnake(Direction.Up);
+            MoveSnake(Direction.Up, false);
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
         {
-            MoveSnake(Direction.Left);
+            MoveSnake(Direction.Left, false);
         }
         else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
         {
-            MoveSnake(Direction.Right);
+            MoveSnake(Direction.Right, false);
         }
         else if (time >= gameSpeed)
         {
-            MoveSnake(snake.Dir);
+            MoveSnake(snake.Dir, true);
         }
     }
 }
