@@ -1,4 +1,5 @@
-using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,6 +25,12 @@ public class SnakeManager : MonoBehaviour
     private float gameSpeed = 0.15f;
 
     [SerializeField]
+    private float aiSpeed = 0.15f;
+
+    [SerializeField]
+    private bool aiMode = false;
+
+    [SerializeField]
     private LevelUI levelUI;
 
     [SerializeField]
@@ -44,18 +51,22 @@ public class SnakeManager : MonoBehaviour
 
     private bool gameOver;
 
+    private Cell apple;
+    private Queue<Direction> aiMoves;
+
     void Start()
     {
         float orthSize = Camera.main.orthographicSize;
         float aspectRatio = Camera.main.aspect;
         width = (int) (height * aspectRatio) + 2;
+        //width = height;
 
         // Set the camera's origin to bottom-left corner, so that
         // bottom-left of the screen is (0, 0) in the world.
         Camera.main.transform.position = new Vector3(aspectRatio * orthSize, orthSize, -10f);
 
-        snake = new Snake(width, height, 2, 12, 4, Direction.Right, true);
-        snake.SpawnApple(15, 15);
+        snake = new Snake(width, height, 3, 3, 2, Direction.Right, true);
+        apple = snake.SpawnAppleInEmptyTile();
 
         objectsGrid = new GameObject[height, width];
 
@@ -72,6 +83,34 @@ public class SnakeManager : MonoBehaviour
 
         time = 0f;
         gameOver = false;
+
+        EnableAI();
+    }
+
+    void EnableAI()
+    {
+        aiMode = true;
+        RequestAIMoves();
+    }
+
+    void RequestAIMoves()
+    {
+        var moves = AIRunner.GetMoves(width, height, snake.snakeCells, apple);
+
+        var strategy = string.Join(',', moves.Select(m => m.ToString()));
+        Debug.Log($"Found moves: {strategy}");
+
+        aiMoves = new Queue<Direction>();
+        foreach (Direction move in moves)
+        {
+            aiMoves.Enqueue(move);
+        }
+    }
+
+    void DisableAI()
+    {
+        aiMode = false;
+        aiMoves = null;
     }
 
     void MoveSnake(Direction dir, bool onTime)
@@ -137,8 +176,8 @@ public class SnakeManager : MonoBehaviour
                 appleCrunch.Play();
                 score.Value = score.Value + 1;
                 levelUI.SetScore(score.Value);
-                Cell appleCell = snake.SpawnAppleInEmptyTile();
-                UpdateTile(appleCell);
+                apple = snake.SpawnAppleInEmptyTile();
+                UpdateTile(apple);
                 gameSpeed *= 0.9f;
                 backgroundMusic.pitch *= 1.01f;
                 break;
@@ -157,6 +196,41 @@ public class SnakeManager : MonoBehaviour
     }
 
     void Update()
+    {
+        if (aiMode)
+            ApplyAIMove();
+        else
+            ApplyPlayerInput();
+    }
+
+    void ApplyAIMove()
+    {
+        time += Time.deltaTime;
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit();
+        }
+        else if (gameOver)
+        {
+            return;
+        }
+        else if (time >= aiSpeed)
+        {
+            if (aiMoves != null)
+            {
+                if (aiMoves.Count == 0)
+                {
+                    RequestAIMoves();
+                }
+
+                Direction move = aiMoves.Dequeue();
+                MoveSnake(move, true);
+            }
+        }
+    }
+
+    void ApplyPlayerInput()
     {
         time += Time.deltaTime;
 
@@ -189,4 +263,30 @@ public class SnakeManager : MonoBehaviour
             MoveSnake(snake.Dir, true);
         }
     }
+
+    void ApplyAIMoves()
+    {
+        // we need to have aiTimeStep to control AI speed, ie how much time should come between AI moves:
+
+        // if time > aiNextTime:
+        //   if buffer is empty:
+        //      send new apple to AI
+        //      get moves
+        //      save it to the buffer
+        //      pop one move from the buffer
+        //      apply and display it
+        //   else:
+        //      pop one move from the buffer
+        //      apply and display it
+        //   aiNextTime += aiTimeStep
+        // else:
+        //    do nothing
+
+        // time += Time.deltaTime
+
+
+        // we also need to init AI whenever we switch to AI mode (send it the snake cells, direction and grid dimensions),
+        // 
+    }
+
 }

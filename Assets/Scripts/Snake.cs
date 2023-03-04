@@ -118,7 +118,7 @@ public class Grid
 
 public class Snake
 {
-    private LinkedList<Cell> snakeCells;
+    public LinkedList<Cell> snakeCells;
 
     public Snake(int width, int height, int snakeHeadRow, int snakeHeadCol, int snakeLength, Direction dir, bool withWalls)
     {
@@ -187,6 +187,12 @@ public class Snake
         get => snakeCells.First.Value;
     }
 
+    // for use in the AI
+    public LinkedList<Cell> SnakeCells
+    {
+        get => snakeCells;
+    }
+
     public MoveResult Move()
     {
         var tile = Grid.GetTile(Head.Row, Head.Col);
@@ -228,11 +234,12 @@ public class Snake
         };
     }
 
-    public void SpawnApple(int row, int col)
+    public Cell SpawnApple(int row, int col)
     {
         var cell = new Cell(row, col);
         Grid.CheckBounds(cell);
         Grid.SetTile(cell, Tile.Apple);
+        return cell;
     }
 
     public Cell SpawnAppleInEmptyTile()

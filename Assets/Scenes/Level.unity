@@ -977,6 +977,8 @@ MonoBehaviour:
   tileScale: 0.9
   margin: 0.5
   gameSpeed: 0.15
+  aiSpeed: 0.01
+  aiMode: 1
   levelUI: {fileID: 55616020}
   score: {fileID: 11400000, guid: 71a7614c2abaf46b08325f341e54e780, type: 2}
   hiScore: {fileID: 11400000, guid: 770b975dfc6ed4a168e744ff9e4c3ab1, type: 2}
