@@ -22,7 +22,10 @@ public class SnakeManager : MonoBehaviour
     private float margin = 0.5f;
 
     [SerializeField]
-    private float gameSpeed = 0.15f;
+    private float startHumanSpeed = 0.15f;
+
+    [SerializeField]
+    private float aiSpeed = 0.03f;
 
     [SerializeField]
     private BoolVar aiMode;
@@ -50,6 +53,7 @@ public class SnakeManager : MonoBehaviour
 
     private Cell apple;
     private Queue<Direction> aiMoves;
+    private float gameSpeed;
 
     void Start()
     {
@@ -79,6 +83,7 @@ public class SnakeManager : MonoBehaviour
 
         time = 0f;
         gameOver = false;
+        gameSpeed = startHumanSpeed;
 
         if (aiMode.Value) EnableAI();
     }
@@ -86,6 +91,7 @@ public class SnakeManager : MonoBehaviour
     void EnableAI()
     {
         aiMode.Value = true;
+        gameSpeed = aiSpeed;
         RequestAIMoves();
     }
 
@@ -114,6 +120,7 @@ public class SnakeManager : MonoBehaviour
     {
         aiMode.Value = false;
         aiMoves = null;
+        gameSpeed = startHumanSpeed;
     }
 
     void MoveSnake(Direction dir, bool onTime)
@@ -181,14 +188,14 @@ public class SnakeManager : MonoBehaviour
                 levelUI.SetScore(score.Value);
                 apple = snake.SpawnAppleInEmptyTile();
                 UpdateTile(apple);
-                gameSpeed *= 0.9f;
+                if (!aiMode.Value) gameSpeed *= 0.9f;
                 backgroundMusic.pitch *= 1.01f;
                 break;
 
             case MoveResultType.Hit:
                 snakeHit.Play();
                 gameOver = true;
-                Invoke(nameof(GameOver), 0.5f);
+                Invoke(nameof(GameOver), 1f);
                 break;
         };
     }
