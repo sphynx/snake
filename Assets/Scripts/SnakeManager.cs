@@ -106,8 +106,8 @@ public class SnakeManager : MonoBehaviour
             return;
         }
 
-        var strategy = string.Join(',', moves.Select(m => m.ToString()));
-        Debug.Log($"Found moves: {strategy}");
+        //var strategy = string.Join(',', moves.Select(m => m.ToString()));
+        //Debug.Log($"Found moves: {strategy}");
 
         aiMoves = new Queue<Direction>();
         foreach (Direction move in moves)

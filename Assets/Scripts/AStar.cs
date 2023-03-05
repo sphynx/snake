@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using UnityEngine;
 
 public class AStar
 {
@@ -12,16 +11,11 @@ public class AStar
     {
         State.width = width;
         State.height = height;
-
-        // Set up start and goal.
         State.goal = goal;
 
         this.start = new SearchNode(start, null, Direction.Left, 0);
         this.frontier = new AStarFrontier();
         this.frontier.Insert(this.start);
-
-        //Debug.Log($"Searching for {goal} with w={State.width} and h={State.height}");
-        //Debug.Log($"Start state: snake head at {this.start.State.Head}");
     }
 
     public SearchResult Search()
@@ -43,7 +37,6 @@ public class AStar
             if (node.State.IsGoal)
             {
                 // Return path starting from the beginning of the parent link chain.
-                //Debug.Log("Found path ")
                 var path = node.Path();
 
                 long elapsedMs = timer.ElapsedMilliseconds;
@@ -116,9 +109,9 @@ public class SearchNode
 struct Prio<D> : IComparable<Prio<D>> where D : class
 {
     public readonly D data;
-    public readonly int priority;
+    public readonly float priority;
 
-    public Prio(D data, int priority)
+    public Prio(D data, float priority)
     {
         this.data = data;
         this.priority = priority;
@@ -148,7 +141,7 @@ public class AStarFrontier
 
     public void Insert(SearchNode node)
     {
-        int priority = NodePriority(node);
+        float priority = NodePriority(node);
         Prio<SearchNode> nodeWithPriority = new Prio<SearchNode>(node, priority);
         C5.IPriorityQueueHandle<Prio<SearchNode>> handle = null;
         nodes.Add(ref handle, nodeWithPriority);
@@ -159,7 +152,7 @@ public class AStarFrontier
     {
         C5.IPriorityQueueHandle<Prio<SearchNode>> handle = handles[node.State];
         Prio<SearchNode> existingNode = nodes[handle];
-        int newPriority = NodePriority(node);
+        float newPriority = NodePriority(node);
         if (newPriority < existingNode.priority)
         {
             nodes[handle] = new Prio<SearchNode>(node, newPriority);
@@ -184,17 +177,22 @@ public class AStarFrontier
         return handles.ContainsKey(state);
     }
 
-    static int NodePriority(SearchNode node)
+    static float NodePriority(SearchNode node)
     {
-        return node.PathLength + Heuristic(node);
+        // We multiple heuristics by 1.001 to break the ties between similar paths,
+        // so that we need to explore only one of them.
+        // See https://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html#breaking-ties.
+        // This has a nice side effect that AI avoids "ladders" like paths and
+        // prefers straight human-like patterns.
+        return (float) node.PathLength + 1.001f * Heuristic(node);
     }
 
-    static int Heuristic(SearchNode node)
+    static float Heuristic(SearchNode node)
     {
         // We use Manhattan distance to the goal as our estimate:
         int drow = Math.Abs(State.goal.Row - node.State.Head.Row);
         int dcol = Math.Abs(State.goal.Col - node.State.Head.Col);
-        return drow + dcol;
+        return (float) drow + dcol;
     }
 }
 
