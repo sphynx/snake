@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class AStar
@@ -23,14 +24,20 @@ public class AStar
         //Debug.Log($"Start state: snake head at {this.start.State.Head}");
     }
 
-    public ICollection<Direction> Search()
+    public SearchResult Search()
     {
+        Stopwatch timer = Stopwatch.StartNew();
+        float maxTime = 1_000; // ms
+
         // Set up explored set of states in order not to repeat ourselves.
         HashSet<State> explored = new HashSet<State>();
+        HashSet<Cell> exploredCells = new HashSet<Cell>();
 
         while (!frontier.IsEmpty)
         {
             SearchNode node = frontier.Pop();
+
+            if (timer.ElapsedMilliseconds > maxTime) break;
 
             // Are we done?
             if (node.State.IsGoal)
@@ -39,16 +46,22 @@ public class AStar
                 //Debug.Log("Found path ")
                 var path = node.Path();
 
-                Debug.Log($"Found path of length={path.Count} by exploring {explored.Count} states");
-                return path;
+                long elapsedMs = timer.ElapsedMilliseconds;
+
+                UnityEngine.Debug.Log($"Found path of length={path.Count} by exploring {explored.Count} states in {elapsedMs} ms");
+
+                SearchResult res = new SearchResult(path, elapsedMs, explored.Count);
+
+                return res;
             };
 
             explored.Add(node.State);
+            exploredCells.Add(node.State.Head);
 
             foreach (Direction action in node.State.Actions())
             {
                 var childNode = new SearchNode(node, action);
-                if (!explored.Contains(childNode.State) && !frontier.Contains(childNode.State))
+                if (!exploredCells.Contains(childNode.State.Head) && !explored.Contains(childNode.State) && !frontier.Contains(childNode.State))
                 {
                     frontier.Insert(childNode);
                 }
@@ -60,7 +73,7 @@ public class AStar
         }
 
         // No solution found:
-        return null;
+        return new SearchResult(null, timer.ElapsedMilliseconds, explored.Count);
     }
 }
 
@@ -182,5 +195,19 @@ public class AStarFrontier
         int drow = Math.Abs(State.goal.Row - node.State.Head.Row);
         int dcol = Math.Abs(State.goal.Col - node.State.Head.Col);
         return drow + dcol;
+    }
+}
+
+public class SearchResult
+{
+    public LinkedList<Direction> Path;
+    public long ElapsedMs;
+    public int ExploredStates;
+
+    public SearchResult(LinkedList<Direction> path, long elapsedMs, int exploredStates)
+    {
+        Path = path;
+        ElapsedMs = elapsedMs;
+        ExploredStates = exploredStates;
     }
 }

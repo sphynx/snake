@@ -25,10 +25,7 @@ public class SnakeManager : MonoBehaviour
     private float gameSpeed = 0.15f;
 
     [SerializeField]
-    private float aiSpeed = 0.15f;
-
-    [SerializeField]
-    private bool aiMode = false;
+    private BoolVar aiMode;
 
     [SerializeField]
     private LevelUI levelUI;
@@ -59,13 +56,12 @@ public class SnakeManager : MonoBehaviour
         float orthSize = Camera.main.orthographicSize;
         float aspectRatio = Camera.main.aspect;
         width = (int) (height * aspectRatio) + 2;
-        //width = height;
 
         // Set the camera's origin to bottom-left corner, so that
         // bottom-left of the screen is (0, 0) in the world.
         Camera.main.transform.position = new Vector3(aspectRatio * orthSize, orthSize, -10f);
 
-        snake = new Snake(width, height, 3, 3, 2, Direction.Right, true);
+        snake = new Snake(width, height, 2, 2, 2, Direction.Right, true);
         apple = snake.SpawnAppleInEmptyTile();
 
         objectsGrid = new GameObject[height, width];
@@ -84,18 +80,25 @@ public class SnakeManager : MonoBehaviour
         time = 0f;
         gameOver = false;
 
-        EnableAI();
+        if (aiMode.Value) EnableAI();
     }
 
     void EnableAI()
     {
-        aiMode = true;
+        aiMode.Value = true;
         RequestAIMoves();
     }
 
     void RequestAIMoves()
     {
         var moves = AIRunner.GetMoves(width, height, snake.snakeCells, apple);
+
+        if (moves == null)
+        {
+            // Can't find moves
+            DisableAI();
+            return;
+        }
 
         var strategy = string.Join(',', moves.Select(m => m.ToString()));
         Debug.Log($"Found moves: {strategy}");
@@ -109,7 +112,7 @@ public class SnakeManager : MonoBehaviour
 
     void DisableAI()
     {
-        aiMode = false;
+        aiMode.Value = false;
         aiMoves = null;
     }
 
@@ -197,7 +200,7 @@ public class SnakeManager : MonoBehaviour
 
     void Update()
     {
-        if (aiMode)
+        if (aiMode.Value)
             ApplyAIMove();
         else
             ApplyPlayerInput();
@@ -215,7 +218,11 @@ public class SnakeManager : MonoBehaviour
         {
             return;
         }
-        else if (time >= aiSpeed)
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (aiMode.Value) DisableAI(); else EnableAI();
+        }
+        else if (time >= gameSpeed)
         {
             if (aiMoves != null)
             {
@@ -224,8 +231,11 @@ public class SnakeManager : MonoBehaviour
                     RequestAIMoves();
                 }
 
-                Direction move = aiMoves.Dequeue();
-                MoveSnake(move, true);
+                if (aiMoves != null)
+                {
+                    Direction move = aiMoves.Dequeue();
+                    MoveSnake(move, true);
+                }
             }
         }
     }
@@ -241,6 +251,10 @@ public class SnakeManager : MonoBehaviour
         else if (gameOver)
         {
             return;
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (aiMode.Value) DisableAI(); else EnableAI();
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
         {
@@ -263,30 +277,4 @@ public class SnakeManager : MonoBehaviour
             MoveSnake(snake.Dir, true);
         }
     }
-
-    void ApplyAIMoves()
-    {
-        // we need to have aiTimeStep to control AI speed, ie how much time should come between AI moves:
-
-        // if time > aiNextTime:
-        //   if buffer is empty:
-        //      send new apple to AI
-        //      get moves
-        //      save it to the buffer
-        //      pop one move from the buffer
-        //      apply and display it
-        //   else:
-        //      pop one move from the buffer
-        //      apply and display it
-        //   aiNextTime += aiTimeStep
-        // else:
-        //    do nothing
-
-        // time += Time.deltaTime
-
-
-        // we also need to init AI whenever we switch to AI mode (send it the snake cells, direction and grid dimensions),
-        // 
-    }
-
 }

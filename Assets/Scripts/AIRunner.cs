@@ -15,11 +15,9 @@ public static class AIRunner
 
         State state = new State(adjustedSnake);
         AStar search = new AStar(state, gridWidth - 2 , gridHeight - 2, adjustedApple);
+        SearchResult searchResult = search.Search();
 
-        ICollection<Direction> moves = search.Search();
-
-        if (moves == null)
-            throw new Exception($"AI couldn't find the path to {adjustedApple}");
+        ICollection<Direction> moves = searchResult.Path;
 
         return moves;
     }

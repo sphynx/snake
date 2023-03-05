@@ -240,6 +240,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a737746489be940fb808ea351bc3a902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aiMode: {fileID: 11400000, guid: d62d18ee5cc534306bdef6748e9e183e, type: 2}
 --- !u!1 &832564775
 GameObject:
   m_ObjectHideFlags: 0
@@ -376,10 +377,18 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Controls: use arrows to move.
 
-    Game speed gradually increases.
+    Use space to enable <color=yellow>AI-assistance</color>.
 
-    Press
-    ENTER to start.'
+    Game
+    speed gradually increases.
+
+    Press ENTER to start,
+
+    Press I to see AI
+    play.
+
+
+    Enjoy!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
   m_sharedMaterial: {fileID: 2140032, guid: dc36b3fdc14f47ebb36fd484a67e268a, type: 2}
@@ -442,7 +451,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -4.8125305, y: 0, z: 0, w: 0}
+  m_margin: {x: -4.8125305, y: 0, z: -35.325912, w: -33.789986}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
