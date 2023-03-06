@@ -131,6 +131,6 @@ public class State : IEquatable<State>
 
     bool HitsItself(Cell cell)
     {
-        return snake.Contains(cell) /*&& !cell.Equals(snake.Last.Value)*/ ;
+        return snake.Contains(cell) && !cell.Equals(snake.Last.Value);
     }
 }

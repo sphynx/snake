@@ -201,11 +201,13 @@ public class Snake
         // Move the snake and update the grid.
         Cell newHead = Grid.ApplyDirection(Head, Dir);
         Cell oldHead = Head;
+        Cell tail = snakeCells.Last.Value;
+
         Grid.CheckBounds(newHead);
 
         var newHeadTile = Grid.GetTile(newHead);
 
-        if (newHeadTile == Tile.Empty || newHeadTile == Tile.Apple)
+        if (newHeadTile == Tile.Empty || newHeadTile == Tile.Apple || newHead.Equals(tail))
         {
             Grid.SetTile(newHead, Tile.SnakeHead);
             Grid.SetTile(Head, Tile.SnakeBody);
@@ -220,11 +222,16 @@ public class Snake
 
         if (newHeadTile == Tile.Empty)
         {
-            var tail = snakeCells.Last.Value;
             Grid.SetTile(tail, Tile.Empty);
             snakeCells.RemoveLast();
 
             var updatedCells = new Cell[] { newHead, oldHead, tail };
+            return new MoveResult(MoveResultType.Move, updatedCells);
+        }
+        else if (newHead.Equals(tail))
+        {
+            snakeCells.RemoveLast();
+            var updatedCells = new Cell[] { newHead, oldHead };
             return new MoveResult(MoveResultType.Move, updatedCells);
         }
         else
