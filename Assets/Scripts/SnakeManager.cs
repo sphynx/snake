@@ -85,6 +85,8 @@ public class SnakeManager : MonoBehaviour
         gameOver = false;
         gameSpeed = startHumanSpeed;
 
+        AIStatistics.Clear();
+
         if (aiMode.Value) EnableAI();
     }
 

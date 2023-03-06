@@ -21,7 +21,7 @@ public class AStar
     public SearchResult Search()
     {
         Stopwatch timer = Stopwatch.StartNew();
-        float maxTime = 1_000; // ms
+        const int MAX_TIME = 1_000; // ms
 
         // Set up explored set of states in order not to repeat ourselves.
         HashSet<State> explored = new HashSet<State>();
@@ -31,7 +31,7 @@ public class AStar
         {
             SearchNode node = frontier.Pop();
 
-            if (timer.ElapsedMilliseconds > maxTime) break;
+            if (timer.ElapsedMilliseconds > MAX_TIME) break;
 
             // Are we done?
             if (node.State.IsGoal)
@@ -40,10 +40,11 @@ public class AStar
                 var path = node.Path();
 
                 long elapsedMs = timer.ElapsedMilliseconds;
+                long elapsedMicroSeconds = timer.ElapsedTicks / 10;
 
                 UnityEngine.Debug.Log($"Found path of length={path.Count} by exploring {explored.Count} states in {elapsedMs} ms");
 
-                SearchResult res = new SearchResult(path, elapsedMs, explored.Count);
+                SearchResult res = new SearchResult(path, elapsedMicroSeconds, explored.Count);
 
                 return res;
             };
@@ -66,7 +67,7 @@ public class AStar
         }
 
         // No solution found:
-        return new SearchResult(null, timer.ElapsedMilliseconds, explored.Count);
+        return new SearchResult(null, timer.ElapsedTicks / 10, explored.Count);
     }
 }
 
@@ -199,13 +200,13 @@ public class AStarFrontier
 public class SearchResult
 {
     public LinkedList<Direction> Path;
-    public long ElapsedMs;
+    public long ElapsedMicroSeconds;
     public int ExploredStates;
 
-    public SearchResult(LinkedList<Direction> path, long elapsedMs, int exploredStates)
+    public SearchResult(LinkedList<Direction> path, long elapsedMicroSeconds, int exploredStates)
     {
         Path = path;
-        ElapsedMs = elapsedMs;
+        ElapsedMicroSeconds = elapsedMicroSeconds;
         ExploredStates = exploredStates;
     }
 }

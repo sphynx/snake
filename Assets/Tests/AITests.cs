@@ -78,6 +78,41 @@ public class AITests
         Assert.AreEqual(2 * 999, path.Count);
     }
 
+    /*
+    3x3 board with a situation like this (H=head, A=apple, *=body, .=empty_space).
+    The bot shouldn't get the apple immediately, because it will be dead next turn.
+
+     . . .
+
+     * *-H
+     | |
+     *-* A
+
+     */
+    [Test]
+    public void Test_TemptationOfStAnthony()
+    {
+        List<Cell> snake = new List<Cell>() { new Cell(1, 2), new Cell(1, 1), new Cell(0, 1), new Cell(0, 0), new Cell(1, 0) };
+        var path = HasPath(3, 3, 0, 2, snake);
+        Assert.That(path.Count > 1);
+    }
+
+    /*
+     . A .
+
+     . *-*
+       | |
+     . * H
+
+     */
+    [Test]
+    public void Test_SeesExit()
+    {
+        List<Cell> snake = new List<Cell>() { new Cell(0, 2), new Cell(1, 2), new Cell(1, 1), new Cell(0, 1) };
+        var path = HasPath(3, 3, 2, 1, snake);
+        Assert.AreEqual(3, path.Count);
+    }
+
     ICollection<Direction> HasPath(int w, int h, int goalRow, int goalCol, List<Cell> snake)
     {
         State state = new State(snake);

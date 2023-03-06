@@ -33,6 +33,8 @@ public class GameOverUI : MonoBehaviour
 
         scoreText.text = $"Your score: {score.Value}";
         hiScoreText.text = $"High score: {hiScore.Value}";
+
+        AIStatistics.PrintStats();
     }
 
     void Update()
